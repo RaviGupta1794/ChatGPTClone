@@ -2,7 +2,7 @@
   "name": "Backend",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
+    "start": "node Server.js",
     "dev": "nodemon server.js"
   },
   "dependencies": {
