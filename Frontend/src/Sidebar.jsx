@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from "react";
 import "./Sidebar.css";
 import MyContext from "./MyContext.jsx";
 import { v4 as uuidv4 } from "uuid";
+import logo from "./assets/blacklogo.png";
 
 export default function Sidebar() {
   const {
@@ -182,7 +183,7 @@ export default function Sidebar() {
   return (
     <section className="sidebar">
       <button onClick={createNewChat}>
-        <img src="src/assets/blacklogo.png" alt="gpt-logo" className="logo" />
+        <img src={logo} alt="gpt-logo" className="logo" />
 
         <span>
           <i className="fa-solid fa-pen-to-square"></i>
