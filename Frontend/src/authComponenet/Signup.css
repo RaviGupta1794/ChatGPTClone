@@ -38,6 +38,25 @@
 }
 
 /*-------logo ------*/
+
+.close-auth{
+    position:absolute;
+    right:15px;
+    top:15px;
+
+    border:none;
+    background:none;
+
+    font-size:22px;
+    cursor:pointer;
+
+    color:#555;
+}
+
+
+.close-auth:hover{
+    color:black;
+}
 .signup-logo{
     width:75px;
     height:75px;

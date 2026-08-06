@@ -13,17 +13,47 @@ export default function Sidebar() {
     setPrompt,
     setReply,
     setCurrThreadId,
+    currentUser,
+    setAuthPage,
+    setShowAuth,
+    logoutUser,
   } = useContext(MyContext);
+
+  //   const logoutUser = () => {
+  //   localStorage.removeItem("token");
+  //   localStorage.removeItem("user");
+
+  //   setCurrentUser(null);
+  //   setAllThread([]);
+  //   setPrevChat([]);
+  //   setReply(null);
+  //   setPrompt("");
+
+  //   setAuthPage("login");
+  //   setShowAuth(true);
+  // };
 
   // ---------------- Get All Threads ----------------
 
   const getAllThread = async () => {
+    const token = localStorage.getItem("token");
+
+    //User not logged in
+    if (!token) {
+      setAllThread([]);
+      return;
+    }
     try {
       const response = await fetch("http://localhost:8080/api/thread", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       });
+
+      if (response.status === 401) {
+        logoutUser();
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("Failed to fetch threads");
@@ -43,12 +73,20 @@ export default function Sidebar() {
   };
 
   useEffect(() => {
-    getAllThread();
-  }, [currThreadId]);
-
+    if (currentUser) {
+      getAllThread();
+    } else {
+      setAllThread([]);
+    }
+  }, [currentUser]);
   // ---------------- New Chat ----------------
 
   const createNewChat = () => {
+    if (!currentUser) {
+      setAuthPage("login");
+      setShowAuth(true);
+      return;
+    }
     setNewChat(true);
     setPrompt("");
     setReply(null);
@@ -59,25 +97,34 @@ export default function Sidebar() {
   // ---------------- Change Thread ----------------
 
   const changeThread = async (newThreadId) => {
-    setCurrThreadId(newThreadId);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setAuthPage("login");
+      setShowAuth(true);
+      return;
+    }
 
     try {
       const response = await fetch(
         `http://localhost:8080/api/thread/${newThreadId}`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
+      if (response.status === 401) {
+        logoutUser();
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("Failed to fetch thread");
       }
 
       const res = await response.json();
-
-      setPrevChat(res);
+      setCurrThreadId(newThreadId);
+      setPrevChat(res.messages || res);
       setNewChat(false);
       setReply(null);
     } catch (error) {
@@ -88,28 +135,42 @@ export default function Sidebar() {
   // ---------------- Delete Thread ----------------
 
   const deleteThread = async (threadId) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setAuthPage("login");
+      setShowAuth(true);
+      return;
+    }
     try {
       const response = await fetch(
         `http://localhost:8080/api/thread/${threadId}`,
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
-
+      if (response.status === 401) {
+        logoutUser();
+        return;
+      }
       if (!response.ok) {
         throw new Error("Failed to delete thread");
       }
 
-      setAllThread((prev) =>
-        prev.filter((thread) => thread.threadId !== threadId)
-      );
-
+      // setAllThread((prev) =>
+      //   prev.filter((thread) => thread.threadId !== threadId),
+      // );
       if (threadId === currThreadId) {
-        createNewChat();
+        setPrevChat([]);
+        setReply(null);
+        setPrompt("");
+        setNewChat(true);
+        setCurrThreadId(uuidv4());
       }
+
+      await getAllThread();
     } catch (error) {
       console.log(error);
     }
@@ -118,11 +179,7 @@ export default function Sidebar() {
   return (
     <section className="sidebar">
       <button onClick={createNewChat}>
-        <img
-          src="src/assets/blacklogo.png"
-          alt="gpt-logo"
-          className="logo"
-        />
+        <img src="src/assets/blacklogo.png" alt="gpt-logo" className="logo" />
 
         <span>
           <i className="fa-solid fa-pen-to-square"></i>
@@ -134,9 +191,7 @@ export default function Sidebar() {
           <li
             key={thread.threadId}
             onClick={() => changeThread(thread.threadId)}
-            className={
-              thread.threadId === currThreadId ? "highlighted" : ""
-            }
+            className={thread.threadId === currThreadId ? "highlighted" : ""}
           >
             {thread.title}
 

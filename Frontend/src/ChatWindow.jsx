@@ -19,25 +19,39 @@ export default function ChatWindow() {
     setShowAuth,
     authPage,
     setAuthPage,
+    currentUser,
+    logoutUser,
+    setAllThread,
   } = useContext(MyContext);
 
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [lastPrompt, setLastPrompt] = useState("");
+
+  //-----get reply ------
 
   const getReply = async () => {
+    const token = localStorage.getItem("token");
+
+    // If user is not logged in, we show login popup
+    if (!token) {
+      setAuthPage("login");
+      setShowAuth(true);
+      return;
+    }
+
+    if (!prompt.trim()) return;
+
     setLoading(true);
     setNewChat(false);
+    setLastPrompt(prompt);
 
     const options = {
       method: "POST",
-
       headers: {
         "Content-Type": "application/json",
-
-        // sending JWT token
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${token}`,
       },
-
       body: JSON.stringify({
         message: prompt,
         threadId: currThreadId,
@@ -46,49 +60,88 @@ export default function ChatWindow() {
 
     try {
       const response = await fetch("http://localhost:8080/api/chat", options);
+      const res = await response.json().catch(() => ({}));
 
-      const res = await response.json();
+      if (response.status === 401) {
+        logoutUser();
 
-      console.log(res);
+        setAuthPage("login");
+        setShowAuth(true);
+
+        return;
+      }
+
+      if (!response.ok) {
+        console.log(res.message);
+        return;
+      }
 
       setReply(res.reply);
+
+      // Adding first chat to sidebar immediately
+      setAllThread((prev) => {
+        const alreadyExist = prev.some(
+          (thread) => thread.threadId === currThreadId,
+        );
+
+        if (alreadyExist) {
+          return prev;
+        }
+
+        return [
+          ...prev,
+          {
+            threadId: currThreadId,
+            title: prompt.slice(0, 25) + "...",
+          },
+        ];
+      });
+
+
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   useEffect(() => {
-    if (prompt && reply) {
-      setPrevChat((prevChat) => [
-        ...prevChat,
+    if (reply && lastPrompt) {
+      setPrevChat((prev) => [
+        ...prev,
         {
           role: "user",
-          content: prompt,
+          content: lastPrompt,
         },
         {
           role: "assistant",
           content: reply,
         },
       ]);
-    }
 
-    setPrompt("");
+      setPrompt("");
+      setLastPrompt("");
+    }
   }, [reply]);
 
   const handleProfileClick = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
+  // const handleLogout = () => {
+  //   localStorage.removeItem("token");
+  //   localStorage.removeItem("user");
 
-    setAuthPage("login");
+  //   setCurrentUser(null);
 
-    setShowAuth(true);
-  };
+  //   setPrevChat([]);
+  //   setReply(null);
+  //   setPrompt("");
+  //   setNewChat(true);
+  //   setCurrThreadId(uuidv4());
 
+  //   setIsOpen(false);
+  // };
   return (
     <>
       <div className="chat-window">
@@ -100,7 +153,11 @@ export default function ChatWindow() {
 
           <div className="userIconDiv" onClick={handleProfileClick}>
             <span className="userIcon">
-              <i className="fa-solid fa-user"></i>
+              {currentUser ? (
+                currentUser.name.charAt(0).toUpperCase()
+              ) : (
+                <i className="fa-solid fa-user"></i>
+              )}
             </span>
           </div>
         </div>
@@ -117,34 +174,45 @@ export default function ChatWindow() {
               Settings
             </div>
 
-            <div
-              className="dropdownItem"
-              onClick={() => {
-                setAuthPage("signup");
+            {!currentUser && (
+              <>
+                <div
+                  className="dropdownItem"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setAuthPage("signup");
+                    setShowAuth(true);
+                  }}
+                >
+                  <i className="fa-solid fa-user-plus"></i>
+                  Sign Up
+                </div>
 
-                setShowAuth(true);
-              }}
-            >
-              <i className="fa-solid fa-user-plus"></i>
-              SignUp
-            </div>
-
-            <div
-              className="dropdownItem"
-              onClick={() => {
-                setAuthPage("login");
-
-                setShowAuth(true);
-              }}
-            >
-              <i className="fa-solid fa-right-to-bracket"></i>
-              Login
-            </div>
-
-            <div className="dropdownItem" onClick={handleLogout}>
-              <i className="fa-solid fa-right-from-bracket"></i>
-              Logout
-            </div>
+                <div
+                  className="dropdownItem"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setAuthPage("login");
+                    setShowAuth(true);
+                  }}
+                >
+                  <i className="fa-solid fa-right-to-bracket"></i>
+                  Login
+                </div>
+              </>
+            )}
+            {currentUser && (
+              <div
+                className="dropdownItem"
+                onClick={() => {
+                  logoutUser();
+                  setIsOpen(false);
+                }}
+              >
+                <i className="fa-solid fa-right-from-bracket"></i>
+                Logout
+              </div>
+            )}
           </div>
         )}
 

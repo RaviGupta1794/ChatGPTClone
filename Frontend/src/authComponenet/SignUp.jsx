@@ -1,9 +1,10 @@
 import React, { useState, useContext } from "react";
 import "./Signup.css";
 import MyContext from "../MyContext.jsx";
+import Alert from "./Alert.jsx";
 
 export default function SignUp() {
-  const { setShowAuth, setAuthPage } = useContext(MyContext);
+  const { setShowAuth, setAuthPage,setCurrentUser ,alert, showAlert } = useContext(MyContext);
 
   const [user, setUser] = useState({
     name: "",
@@ -34,11 +35,20 @@ export default function SignUp() {
 
       console.log(data);
 
-      if (data.token) {
+      if (data.success) {
         localStorage.setItem("token", data.token);
 
-        // Close popup
-        setShowAuth(false);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        setCurrentUser(data.user);
+
+        showAlert("success", "Account created successfully 🎉");
+
+        setTimeout(() => {
+          setShowAuth(false);
+        }, 1500);
+      } else {
+        showAlert("error", data.message || "Signup failed");
       }
     } catch (error) {
       console.log(error);
@@ -47,6 +57,10 @@ export default function SignUp() {
 
   return (
     <div className="auth-container">
+      {alert.show && <Alert type={alert.type} message={alert.message} />}
+      <button className="close-auth" onClick={() => setShowAuth(false)}>
+        <i className="fa-solid fa-xmark"></i>
+      </button>
       <div className="signup-logo">
         <i className="fa-solid fa-user-plus"></i>
       </div>

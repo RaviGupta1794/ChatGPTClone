@@ -1,9 +1,12 @@
 import React, { useState, useContext } from "react";
 import "./login.css";
 import MyContext from "../MyContext.jsx";
+import Alert from "./Alert.jsx";
 
 export default function Login() {
- const { setShowAuth, setAuthPage } = useContext(MyContext);
+  const { setShowAuth, setAuthPage, setCurrentUser, alert, showAlert } =
+    useContext(MyContext);
+  console.log(alert);
 
   const [user, setUser] = useState({
     email: "",
@@ -33,11 +36,21 @@ export default function Login() {
 
       console.log(data);
 
-      if (data.token) {
+      if (data.success) {
         localStorage.setItem("token", data.token);
 
-        // close popup
-        setShowAuth(false);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        setCurrentUser(data.user);
+
+        showAlert("success", "Login successful 🎉");
+        console.log("Alert called");
+
+        setTimeout(() => {
+          setShowAuth(false);
+        }, 500);
+      } else {
+        showAlert("error", "Invalid email or password");
       }
     } catch (error) {
       console.log(error);
@@ -46,6 +59,10 @@ export default function Login() {
 
   return (
     <div className="auth-container">
+      {alert.show && <Alert type={alert.type} message={alert.message} />}
+      <button className="close-auth" onClick={() => setShowAuth(false)}>
+        <i className="fa-solid fa-xmark"></i>
+      </button>
       <div className="auth-logo">
         <i className="fa-solid fa-robot"></i>
       </div>
@@ -61,6 +78,7 @@ export default function Login() {
           placeholder="Email address"
           value={user.email}
           onChange={handleChange}
+          required
         />
 
         <input
@@ -69,6 +87,7 @@ export default function Login() {
           placeholder="Password"
           value={user.password}
           onChange={handleChange}
+          required
         />
 
         <button type="submit" className="auth-btn">

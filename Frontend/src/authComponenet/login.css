@@ -28,6 +28,7 @@
   border-radius: 18px;
   padding: 35px;
   color: #fff;
+  position: relative;
 
   box-shadow:
     0 20px 60px rgba(0,0,0,.45),
@@ -53,6 +54,26 @@
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+/*----------- cross x----------*/
+
+.close-auth{
+    position:absolute;
+    right:15px;
+    top:15px;
+
+    border:none;
+    background:none;
+
+    font-size:22px;
+    cursor:pointer;
+
+    color:#555;
+}
+
+
+.close-auth:hover{
+    color:black;
 }
 
 /* ---------- Logo ---------- */
