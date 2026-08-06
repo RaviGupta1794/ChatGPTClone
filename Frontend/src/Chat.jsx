@@ -1,0 +1,78 @@
+import React, { useContext, useState, useEffect } from "react";
+import "./Chat.css";
+import MyContext from "./MyContext.jsx";
+import ReactMarkdown from "react-markdown";
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github-dark.css";
+
+export default function Chat() {
+  const { newChat, prevChat, reply } = useContext(MyContext);
+  const [latestReply, setLatestReply] = useState(null);
+
+  useEffect(() => {
+    if (reply === null) {
+      setLatestReply(null); //loading prev chat
+      return;
+    }
+    //typing effect for latest reply
+    if (!prevChat?.length) return;
+
+    const content = reply.split(" "); //individula words
+
+    let idx = 0;
+    const interval = setInterval(() => {
+      setLatestReply(content.slice(0, idx + 1).join(" "));
+      idx++;
+      if (idx >= content.length) clearInterval();
+    }, 40);
+    return () => clearInterval(interval);
+  }, [prevChat, reply]);
+
+  return (
+    <>
+      <div className="chats">
+        {prevChat.length === 0 ? (
+          <div className="welcomeScreen">
+            <h1>What is on your mind today?</h1>
+            <p>I'm SigmaGPT. Ask me anything.</p>
+          </div>
+        ) : (
+          <>
+            <div className="chatTime">
+              Today •{" "}
+              {new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </div>
+
+            {prevChat.map((chat, idx) => (
+              <div
+                key={idx}
+                className={chat.role === "user" ? "userDiv" : "gptDiv"}
+              >
+                {chat.role === "user" ? (
+                  <p className="userMessage">{chat.content}</p>
+                ) : (
+                  <div className="assistantMessage">
+                    <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
+                      {chat.content}
+                    </ReactMarkdown>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {latestReply !== null && (
+              <div className="assistantMessage">
+                <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
+                  {latestReply}
+                </ReactMarkdown>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </>
+  );
+}
