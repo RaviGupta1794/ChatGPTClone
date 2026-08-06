@@ -44,11 +44,14 @@ export default function Sidebar() {
       return;
     }
     try {
-      const response = await fetch("http://localhost:8080/api/thread", {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/thread`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (response.status === 401) {
         logoutUser();
@@ -106,7 +109,7 @@ export default function Sidebar() {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/thread/${newThreadId}`,
+        `${import.meta.env.VITE_API_URL}/api/thread/${newThreadId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -143,7 +146,7 @@ export default function Sidebar() {
     }
     try {
       const response = await fetch(
-        `http://localhost:8080/api/thread/${threadId}`,
+        `${import.meta.env.VITE_API_URL}/api/thread/${threadId}`,
         {
           method: "DELETE",
           headers: {
