@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef} from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import "./Chat.css";
 import MyContext from "./MyContext.jsx";
 import ReactMarkdown from "react-markdown";
@@ -6,52 +6,28 @@ import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
 
 export default function Chat() {
-  const { prevChat, reply } = useContext(MyContext);
-
-  const [latestReply, setLatestReply] = useState(null);
+  const { prevChat } = useContext(MyContext);
 
   const bottomRef = useRef(null);
 
+  // Auto scroll to bottom whenever messages change
   useEffect(() => {
-    if (reply === null) {
-      setLatestReply(null);
-      return;
-    }
-
-    if (!prevChat?.length) return;
-
-    const content = reply.split(" ");
-
-    let idx = 0;
-
-    const interval = setInterval(() => {
-      setLatestReply(
-        content.slice(0, idx + 1).join(" ")
-      );
-
-      idx++;
-
-      if (idx >= content.length) {
-        clearInterval(interval);
-      }
-    }, 40);
-
-    return () => clearInterval(interval);
-  }, [prevChat, reply]);
-
-  useEffect(() => {
-  bottomRef.current?.scrollIntoView({
-    behavior: "auto",
-  });
-}, [latestReply, prevChat]);
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [prevChat]);
 
   return (
     <div className="chats">
 
-      {/* Centered chat content */}
       <div className="chat-content">
 
+        {/* ==========================
+            WELCOME SCREEN
+        ========================== */}
+
         {prevChat.length === 0 ? (
+
           <div className="welcomeScreen">
             <h1>What is on your mind today?</h1>
 
@@ -59,9 +35,15 @@ export default function Chat() {
               I'm SigmaGPT. Ask me anything.
             </p>
           </div>
+
         ) : (
+
           <>
-            {/* Chat Time */}
+
+            {/* ==========================
+                CHAT TIME
+            ========================== */}
+
             <div className="chatTime">
               Today •{" "}
               {new Date().toLocaleTimeString([], {
@@ -70,8 +52,13 @@ export default function Chat() {
               })}
             </div>
 
-            {/* Previous Messages */}
+
+            {/* ==========================
+                ALL MESSAGES
+            ========================== */}
+
             {prevChat.map((chat, idx) => (
+
               <div
                 key={idx}
                 className={
@@ -80,39 +67,48 @@ export default function Chat() {
                     : "gptDiv"
                 }
               >
+
+                {/* USER MESSAGE */}
+
                 {chat.role === "user" ? (
+
                   <p className="userMessage">
                     {chat.content}
                   </p>
+
                 ) : (
+
+                  /* AI MESSAGE */
+
                   <div className="assistantMessage">
+
                     <ReactMarkdown
                       rehypePlugins={[rehypeHighlight]}
                     >
                       {chat.content}
                     </ReactMarkdown>
+
                   </div>
+
                 )}
+
               </div>
+
             ))}
 
-            {/* Latest Typing Reply */}
-            {latestReply !== null && (
-              <div className="gptDiv">
-                <div className="assistantMessage">
-                  <ReactMarkdown
-                    rehypePlugins={[rehypeHighlight]}
-                  >
-                    {latestReply}
-                  </ReactMarkdown>
-                </div>
-              </div>
-            )}
-              <div ref={bottomRef}></div>
+
+            {/* ==========================
+                BOTTOM SCROLL REFERENCE
+            ========================== */}
+
+            <div ref={bottomRef}></div>
+
           </>
+
         )}
 
       </div>
+
     </div>
   );
 }

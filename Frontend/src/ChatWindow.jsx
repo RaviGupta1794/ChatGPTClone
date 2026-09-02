@@ -1,3 +1,4 @@
+
 import React, { useContext, useState } from "react";
 import "./ChatWindow.css";
 import Chat from "./Chat";
@@ -44,24 +45,28 @@ export default function ChatWindow() {
     // Prevent multiple requests
     if (loading) return;
 
-    // Get token
+    // ==========================
+    // CHECK LOGIN
+    // ==========================
+
     const token = localStorage.getItem("token");
 
-    // User not logged in
     if (!token) {
       setAuthPage("login");
       setShowAuth(true);
       return;
     }
 
-    // Empty input
+    // ==========================
+    // CHECK INPUT
+    // ==========================
+
     if (!prompt.trim()) return;
 
-    // Save current input
     const currentPrompt = prompt.trim();
 
     // ==========================
-    // ADD USER MESSAGE
+    // SHOW USER MESSAGE
     // ==========================
 
     setPrevChat((prev) => [
@@ -72,37 +77,46 @@ export default function ChatWindow() {
       },
     ]);
 
-    // Clear input immediately
+    // Clear input
     setPrompt("");
 
-    // Current thread is now active
+    // Current chat is no longer new
     setNewChat(false);
+
+    // // Remove old reply
+    // setReply(null);
 
     setLoading(true);
 
     try {
       // ==========================
-      // SEND TO BACKEND
+      // CALL BACKEND
       // ==========================
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chat`, {
-        method: "POST",
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/chat`,
+        {
+          method: "POST",
 
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
 
-        body: JSON.stringify({
-          message: currentPrompt,
-          threadId: currThreadId,
-        }),
-      });
+          body: JSON.stringify({
+            message: currentPrompt,
+            threadId: currThreadId,
+          }),
+        }
+      );
 
       const res = await response.json().catch(() => ({}));
 
+      console.log("Chat API status:", response.status);
+      console.log("Chat API response:", res);
+
       // ==========================
-      // UNAUTHORIZED
+      // TOKEN EXPIRED
       // ==========================
 
       if (response.status === 401) {
@@ -115,30 +129,37 @@ export default function ChatWindow() {
       }
 
       // ==========================
-      // OTHER ERROR
+      // BACKEND ERROR
       // ==========================
 
       if (!response.ok) {
-        console.log("Chat error:", res);
+        console.error("Chat API error:", res);
         return;
       }
 
       // ==========================
-      // BACKEND RESPONSE
+      // CHECK AI RESPONSE
       // ==========================
-
-      console.log("Backend response:", res);
 
       if (!res.reply) {
-        console.log("No reply received from backend");
+        console.error("Backend did not return reply:", res);
         return;
       }
 
       // ==========================
-      // SET AI REPLY
+      // ADD AI MESSAGE
       // ==========================
 
-      setReply(res.reply);
+      setPrevChat((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: res.reply,
+        },
+      ]);
+
+      // // Store latest reply
+      // setReply(res.reply);
 
       // ==========================
       // ADD THREAD TO SIDEBAR
@@ -146,20 +167,17 @@ export default function ChatWindow() {
 
       setAllThread((prev) => {
         const alreadyExists = prev.some(
-          (thread) => thread.threadId === currThreadId,
+          (thread) => thread.threadId === currThreadId
         );
 
-        // Thread already exists
         if (alreadyExists) {
           return prev;
         }
 
-        // First message of this thread
         return [
           ...prev,
           {
             threadId: currThreadId,
-
             title:
               currentPrompt.length > 25
                 ? currentPrompt.slice(0, 25) + "..."
@@ -168,7 +186,7 @@ export default function ChatWindow() {
         ];
       });
     } catch (error) {
-      console.log("Fetch error:", error);
+      console.error("Fetch error:", error);
     } finally {
       setLoading(false);
     }
@@ -180,14 +198,6 @@ export default function ChatWindow() {
 
   const handleProfileClick = () => {
     setIsOpen((prev) => !prev);
-  };
-
-  // ==========================
-  // TOGGLE SIDEBAR
-  // ==========================
-
-  const toggleSidebar = () => {
-    setSidebarOpen((prev) => !prev);
   };
 
   // ==========================
@@ -204,12 +214,17 @@ export default function ChatWindow() {
   return (
     <>
       <div className="chat-window">
+
         {/* ==========================
             NAVBAR
         ========================== */}
+
         <div className="navbar">
+
           <div className="navbar-left">
-            {/* Show toggle only when sidebar is CLOSED */}
+
+            {/* Show toggle when sidebar is closed */}
+
             {!sidebarOpen && (
               <button
                 className="window-toggle"
@@ -221,27 +236,42 @@ export default function ChatWindow() {
               </button>
             )}
 
-            <span className="logoTitle">ChatGPT</span>
+            <span className="logoTitle">
+              ChatGPT
+            </span>
+
           </div>
 
-          {/* USER */}
-          <div className="userIconDiv" onClick={handleProfileClick}>
+          {/* ==========================
+              USER ICON
+          ========================== */}
+
+          <div
+            className="userIconDiv"
+            onClick={handleProfileClick}
+          >
             <span className="userIcon">
+
               {currentUser ? (
-                currentUser.name.charAt(0).toUpperCase()
+                currentUser.name
+                  .charAt(0)
+                  .toUpperCase()
               ) : (
                 <i className="fa-solid fa-user"></i>
               )}
+
             </span>
           </div>
+
         </div>
 
         {/* ==========================
-            DROPDOWN
+            PROFILE DROPDOWN
         ========================== */}
 
         {isOpen && (
           <div className="dropdown">
+
             <div className="dropdownItem">
               <i className="fa-solid fa-cloud-arrow-up"></i>
               Upgrade Plan
@@ -252,7 +282,9 @@ export default function ChatWindow() {
               Settings
             </div>
 
-            {/* NOT LOGGED IN */}
+            {/* ==========================
+                NOT LOGGED IN
+            ========================== */}
 
             {!currentUser && (
               <>
@@ -282,7 +314,9 @@ export default function ChatWindow() {
               </>
             )}
 
-            {/* LOGGED IN */}
+            {/* ==========================
+                LOGGED IN
+            ========================== */}
 
             {currentUser && (
               <div
@@ -296,6 +330,7 @@ export default function ChatWindow() {
                 Logout
               </div>
             )}
+
           </div>
         )}
 
@@ -306,11 +341,12 @@ export default function ChatWindow() {
         <Chat />
 
         {/* ==========================
-            LOADER
+            LOADING
         ========================== */}
 
         {loading && (
           <div className="loader-container">
+
             <ScaleLoader
               color="#339cff"
               loading={loading}
@@ -319,6 +355,7 @@ export default function ChatWindow() {
               radius={2}
               margin={3}
             />
+
           </div>
         )}
 
@@ -327,12 +364,16 @@ export default function ChatWindow() {
         ========================== */}
 
         <div className="chatInput">
+
           <div className="inputBox">
+
             <input
               type="text"
               placeholder="Ask anything..."
               value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
+              onChange={(e) =>
+                setPrompt(e.target.value)
+              }
               onKeyDown={handleKeyDown}
               disabled={loading}
             />
@@ -344,23 +385,35 @@ export default function ChatWindow() {
             >
               <i className="fa-solid fa-paper-plane"></i>
             </div>
+
           </div>
 
           <p className="info">
-            ChatGPT can make mistakes. Consider checking important information.
+            ChatGPT can make mistakes. Consider
+            checking important information.
           </p>
+
         </div>
+
       </div>
 
       {/* ==========================
-          AUTH
+          AUTH OVERLAY
       ========================== */}
 
       {showAuth && (
         <div className="auth-overlay">
-          {authPage === "login" ? <Login /> : <SignUp />}
+
+          {authPage === "login" ? (
+            <Login />
+          ) : (
+            <SignUp />
+          )}
+
         </div>
       )}
+
     </>
   );
 }
+
