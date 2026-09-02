@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "start": "node Server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon Server.js"
   },
   "dependencies": {
     "@google/genai": "^2.15.0",
