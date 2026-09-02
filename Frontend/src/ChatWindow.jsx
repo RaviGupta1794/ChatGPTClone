@@ -11,7 +11,6 @@ export default function ChatWindow() {
     prompt,
     setPrompt,
 
-    // IMPORTANT
     reply,
     setReply,
 
@@ -30,7 +29,6 @@ export default function ChatWindow() {
 
     setAllThread,
 
-    // SIDEBAR
     sidebarOpen,
     setSidebarOpen,
   } = useContext(MyContext);
@@ -59,33 +57,47 @@ export default function ChatWindow() {
     // Empty input
     if (!prompt.trim()) return;
 
-    // Save current prompt before clearing input
+    // Save current input
     const currentPrompt = prompt.trim();
+
+    // ==========================
+    // ADD USER MESSAGE
+    // ==========================
+
+    setPrevChat((prev) => [
+      ...prev,
+      {
+        role: "user",
+        content: currentPrompt,
+      },
+    ]);
+
+    // Clear input immediately
+    setPrompt("");
+
+    // Current thread is now active
+    setNewChat(false);
 
     setLoading(true);
 
-    // This is NOT a new chat
-    setNewChat(false);
-
-    const options = {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-
-      body: JSON.stringify({
-        message: currentPrompt,
-        threadId: currThreadId,
-      }),
-    };
-
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/chat`,
-        options
-      );
+      // ==========================
+      // SEND TO BACKEND
+      // ==========================
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chat`, {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+
+        body: JSON.stringify({
+          message: currentPrompt,
+          threadId: currThreadId,
+        }),
+      });
 
       const res = await response.json().catch(() => ({}));
 
@@ -107,36 +119,38 @@ export default function ChatWindow() {
       // ==========================
 
       if (!response.ok) {
-        console.log("Chat error:", res.message);
+        console.log("Chat error:", res);
         return;
       }
 
       // ==========================
-      // BACKEND REPLY
+      // BACKEND RESPONSE
       // ==========================
 
       console.log("Backend response:", res);
 
-      // Save AI reply in context
+      if (!res.reply) {
+        console.log("No reply received from backend");
+        return;
+      }
+
+      // ==========================
+      // SET AI REPLY
+      // ==========================
+
       setReply(res.reply);
-
-      // ==========================
-      // CLEAR INPUT
-      // ==========================
-
-      setPrompt("");
 
       // ==========================
       // ADD THREAD TO SIDEBAR
       // ==========================
 
       setAllThread((prev) => {
-        const alreadyExist = prev.some(
-          (thread) => thread.threadId === currThreadId
+        const alreadyExists = prev.some(
+          (thread) => thread.threadId === currThreadId,
         );
 
         // Thread already exists
-        if (alreadyExist) {
+        if (alreadyExists) {
           return prev;
         }
 
@@ -145,6 +159,7 @@ export default function ChatWindow() {
           ...prev,
           {
             threadId: currThreadId,
+
             title:
               currentPrompt.length > 25
                 ? currentPrompt.slice(0, 25) + "..."
@@ -189,67 +204,36 @@ export default function ChatWindow() {
   return (
     <>
       <div className="chat-window">
-
         {/* ==========================
             NAVBAR
         ========================== */}
-
         <div className="navbar">
-
           <div className="navbar-left">
+            {/* Show toggle only when sidebar is CLOSED */}
+            {!sidebarOpen && (
+              <button
+                className="window-toggle"
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Show sidebar"
+                title="Show sidebar"
+              >
+                <i className="fa-solid fa-table-columns"></i>
+              </button>
+            )}
 
-            {/* SIDEBAR TOGGLE */}
-
-            <button
-              className={`window-toggle ${
-                sidebarOpen
-                  ? "sidebar-is-open"
-                  : "sidebar-is-closed"
-              }`}
-              onClick={toggleSidebar}
-              aria-label={
-                sidebarOpen
-                  ? "Hide sidebar"
-                  : "Show sidebar"
-              }
-              title={
-                sidebarOpen
-                  ? "Hide sidebar"
-                  : "Show sidebar"
-              }
-            >
-              <i className="fa-solid fa-table-columns"></i>
-            </button>
-
-            {/* TITLE */}
-
-            <span className="logoTitle">
-              ChatGPT
-            </span>
-
+            <span className="logoTitle">ChatGPT</span>
           </div>
 
-          {/* ==========================
-              USER
-          ========================== */}
-
-          <div
-            className="userIconDiv"
-            onClick={handleProfileClick}
-          >
+          {/* USER */}
+          <div className="userIconDiv" onClick={handleProfileClick}>
             <span className="userIcon">
-
               {currentUser ? (
-                currentUser.name
-                  .charAt(0)
-                  .toUpperCase()
+                currentUser.name.charAt(0).toUpperCase()
               ) : (
                 <i className="fa-solid fa-user"></i>
               )}
-
             </span>
           </div>
-
         </div>
 
         {/* ==========================
@@ -258,29 +242,20 @@ export default function ChatWindow() {
 
         {isOpen && (
           <div className="dropdown">
-
-            {/* Upgrade */}
-
             <div className="dropdownItem">
               <i className="fa-solid fa-cloud-arrow-up"></i>
               Upgrade Plan
             </div>
-
-            {/* Settings */}
 
             <div className="dropdownItem">
               <i className="fa-solid fa-gear"></i>
               Settings
             </div>
 
-            {/* ==========================
-                NOT LOGGED IN
-            ========================== */}
+            {/* NOT LOGGED IN */}
 
             {!currentUser && (
               <>
-                {/* Sign Up */}
-
                 <div
                   className="dropdownItem"
                   onClick={() => {
@@ -292,8 +267,6 @@ export default function ChatWindow() {
                   <i className="fa-solid fa-user-plus"></i>
                   Sign Up
                 </div>
-
-                {/* Login */}
 
                 <div
                   className="dropdownItem"
@@ -309,9 +282,7 @@ export default function ChatWindow() {
               </>
             )}
 
-            {/* ==========================
-                LOGGED IN
-            ========================== */}
+            {/* LOGGED IN */}
 
             {currentUser && (
               <div
@@ -325,7 +296,6 @@ export default function ChatWindow() {
                 Logout
               </div>
             )}
-
           </div>
         )}
 
@@ -357,16 +327,12 @@ export default function ChatWindow() {
         ========================== */}
 
         <div className="chatInput">
-
           <div className="inputBox">
-
             <input
               type="text"
               placeholder="Ask anything..."
               value={prompt}
-              onChange={(e) =>
-                setPrompt(e.target.value)
-              }
+              onChange={(e) => setPrompt(e.target.value)}
               onKeyDown={handleKeyDown}
               disabled={loading}
             />
@@ -378,16 +344,12 @@ export default function ChatWindow() {
             >
               <i className="fa-solid fa-paper-plane"></i>
             </div>
-
           </div>
 
           <p className="info">
-            ChatGPT can make mistakes. Consider
-            checking important information.
+            ChatGPT can make mistakes. Consider checking important information.
           </p>
-
         </div>
-
       </div>
 
       {/* ==========================
@@ -396,13 +358,7 @@ export default function ChatWindow() {
 
       {showAuth && (
         <div className="auth-overlay">
-
-          {authPage === "login" ? (
-            <Login />
-          ) : (
-            <SignUp />
-          )}
-
+          {authPage === "login" ? <Login /> : <SignUp />}
         </div>
       )}
     </>
