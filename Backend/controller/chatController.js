@@ -50,9 +50,9 @@ export const createChat = async (req, res) => {
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("create chat error: ",err);
     res.status(500).json({
-      error: "Something went wrong!",
+      error: err.message,
     });
   }
 };
