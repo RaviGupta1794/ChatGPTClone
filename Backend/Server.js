@@ -1,4 +1,3 @@
-import { GoogleGenAI } from "@google/genai";
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -8,23 +7,58 @@ import chatRoutes from "./routes/chat.js";
 import authRoutes from "./routes/auth.js";
 
 const app = express();
-const port = process.env.PORT;
-app.use(cors());
+
+// ==========================
+// MIDDLEWARE
+// ==========================
+
+app.use(
+  cors({
+    origin: "*",
+  })
+);
+
 app.use(express.json());
-app.use("/api", chatRoutes);
-app.use("/api/auth",authRoutes);
-console.log(process.env.JWT_SECRET);
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-  connectDB();
-});
+
+// ==========================
+// DATABASE
+// ==========================
 
 const connectDB = async () => {
   try {
+    if (mongoose.connection.readyState === 1) {
+      return;
+    }
+
     await mongoose.connect(process.env.MONGO_URL);
-    console.log("connected with database");
+
+    console.log("Connected with database");
   } catch (error) {
     console.log("Failed to connect with DB!", error);
   }
 };
 
+// ==========================
+// ROUTES
+// ==========================
+
+app.use("/api", chatRoutes);
+app.use("/api/auth", authRoutes);
+
+// ==========================
+// TEST ROUTE
+// ==========================
+
+app.get("/", async (req, res) => {
+  await connectDB();
+
+  res.json({
+    message: "MyOwnGPT Backend is running",
+  });
+});
+
+// ==========================
+// VERCEL
+// ==========================
+
+export default app;
