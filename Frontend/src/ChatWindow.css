@@ -2,475 +2,599 @@
    MAIN WINDOW
 =========================== */
 
-.chat-window{
-    width:100%;
-    height:100vh;
+.chat-window {
+  flex: 1;
 
-    background:#212121;
-    color:white;
+  min-width: 0;
 
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
+  height: 100vh;
 
-    position:relative;
+  background: #212121;
+
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+
+  position: relative;
+
+  overflow: hidden;
 }
+
 
 /* ===========================
    NAVBAR
 =========================== */
 
-.navbar{
-    height:70px;
+.navbar {
+  height: 70px;
+  min-height: 70px;
 
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-    padding:0 30px;
+  padding: 0 30px;
 
-    border-bottom:1px solid rgba(255,255,255,.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 
-    background:rgba(33,33,33,.85);
-    backdrop-filter:blur(12px);
+  background: rgba(33, 33, 33, 0.85);
 
-    position:sticky;
-    top:0;
-    z-index:50;
+  backdrop-filter: blur(12px);
+
+  position: relative;
+
+  z-index: 50;
 }
 
-.navbar span{
 
-    display:flex;
-    align-items:center;
-    gap:8px;
+/* ===========================
+   LEFT NAVBAR
+=========================== */
 
-    font-size:19px;
-    font-weight:600;
+.navbar-left {
+  display: flex;
+  align-items: center;
 
-    cursor:pointer;
+  gap: 8px;
 }
 
-.navbar span i{
-    font-size:12px;
-    color:#9ca3af;
+
+/* ===========================
+   SIDEBAR TOGGLE
+=========================== */
+
+.window-toggle {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0;
+  padding: 0;
+
+  border: none;
+  border-radius: 9px;
+
+  background: transparent;
+
+  color: #b4b4b4;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
+
+.window-toggle:hover {
+  background: #303030;
+  color: white;
+}
+
+.window-toggle i {
+  font-size: 17px;
+  color: inherit;
+}
+
+
+/* ===========================
+   SIGMAGPT TITLE
+=========================== */
+
+.logoTitle {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  font-size: 19px;
+  font-weight: 600;
+
+  color: #ececec;
+
+  cursor: pointer;
+}
+
+.logoTitle i {
+  color: #3b82f6;
+
+  font-size: 16px;
+}
+
 
 /* ===========================
    USER ICON
 =========================== */
 
-.userIconDiv{
-    cursor:pointer;
+.userIconDiv {
+  cursor: pointer;
 }
 
-.userIcon{
-
-    width:42px;
-    height:42px;
-
-    border-radius:50%;
-
-    background:linear-gradient(135deg,#339cff,#6dbbff);
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    color:white;
-
-    transition:.3s;
-
-    box-shadow:0 0 20px rgba(51,156,255,.2);
-
-}
-
-.userIcon:hover{
-
-    transform:scale(1.08);
-
-    box-shadow:
-        0 0 25px rgba(51,156,255,.35);
-
-}
-
-/* ===========================
-   CHAT AREA
-=========================== */
-
-.chats{
-
-    flex:1;
-
-    width:100%;
-    max-width:850px;
-
-    margin:auto;
-
-    overflow-y:auto;
-
-    padding:25px;
-}
-
-/* ===========================
-   INPUT SECTION
-=========================== */
-
-.chatInput{
-
-    width:100%;
-
-    padding:22px;
-
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-}
-
-.inputBox{
-
-    width:100%;
-    max-width:820px;
-
-    display:flex;
-    align-items:center;
-
-    position:relative;
-
-    border-radius:18px;
-
-    background:#303030;
-
-    border:1px solid #444;
-
-    transition:.3s;
-
-    box-shadow:
-        0 15px 35px rgba(0,0,0,.3);
-}
-
-.inputBox:hover{
-
-    border-color:#555;
-
-    box-shadow:
-        0 15px 40px rgba(0,0,0,.45);
-
-}
-
-.inputBox input{
-
-    flex:1;
-
-    background:transparent;
-
-    border:none;
-
-    color:white;
-
-    font-size:16px;
-
-    padding:18px 60px 18px 22px;
-}
-
-.inputBox input::placeholder{
-
-    color:#8d8d8d;
-}
-
-.inputBox input:focus{
-
-    outline:none;
-}
-
-#submit{
-
-    position:absolute;
-
-    right:16px;
-
-    width:42px;
-    height:42px;
-
-    border-radius:50%;
-
-    background:#3b82f6;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    color:white;
-
-    cursor:pointer;
-
-    transition:.25s;
-}
-
-#submit:hover{
-
-    transform:scale(1.08);
-
-    background:#60a5fa;
-
-    box-shadow:
-        0 0 18px rgba(59,130,246,.4);
-
-}
-
-.info{
-
-    margin-top:14px;
-
-    color:#8d8d8d;
-
-    font-size:13px;
-}
-
-/* ===========================
-   DROPDOWN
-=========================== */
-
-.dropdown{
-
-    position:absolute;
-
-    top:75px;
-    right:30px;
-
-    width:230px;
-
-    background:#2b2b2b;
-
-    border:1px solid rgba(255,255,255,.06);
-
-    border-radius:16px;
-
-    overflow:hidden;
-
-    animation:dropdown .25s ease;
-
-    box-shadow:
-        0 20px 50px rgba(0,0,0,.45);
-
-    z-index:100;
-}
-
-@keyframes dropdown{
-
-    from{
-        opacity:0;
-        transform:translateY(-10px);
-    }
-
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-
-}
-
-.dropdownItem{
-
-    display:flex;
-    align-items:center;
-
-    gap:14px;
-
-    padding:15px 18px;
-
-    cursor:pointer;
-
-    transition:.25s;
-
-    font-size:15px;
-}
-
-.dropdownItem i{
-
-    width:18px;
-    text-align:center;
-
-    color:#b5b5b5;
-}
-
-.dropdownItem:hover{
-
-    background:#383838;
-
-    color:#fff;
-}
-
-/* ===========================
-   LOADER
-=========================== */
-
-/* Loader */
-
-.loader-container {
-  position: fixed;
-  inset: 0;
+.userIcon {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+    135deg,
+    #339cff,
+    #6dbbff
+  );
 
   display: flex;
   justify-content: center;
   align-items: center;
 
+  color: white;
+
+  transition: 0.3s;
+
+  box-shadow:
+    0 0 20px rgba(51, 156, 255, 0.2);
+}
+
+.userIcon:hover {
+  transform: scale(1.08);
+
+  box-shadow:
+    0 0 25px rgba(51, 156, 255, 0.35);
+}
+
+
+/* ===========================
+   CHAT AREA
+=========================== */
+
+.chats {
+  flex: 1;
+
+  width: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding: 25px 30px;
+
+  box-sizing: border-box;
+
+  scrollbar-gutter: stable;
+}
+
+
+/* ===========================
+   SCROLLBAR
+=========================== */
+
+.chats::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chats::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chats::-webkit-scrollbar-thumb {
+  background: #4d4d4d;
+
+  border-radius: 20px;
+}
+
+.chats::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+.chats {
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    #4d4d4d
+    transparent;
+}
+
+
+/* ===========================
+   INPUT SECTION
+=========================== */
+
+.chatInput {
+  width: 100%;
+
+  padding: 22px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  flex-shrink: 0;
+}
+
+
+.inputBox {
+  width: 100%;
+
+  max-width: 820px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  position: relative;
+
+  border-radius: 18px;
+
+  background: #303030;
+
+  border: 1px solid #444;
+
+  transition: 0.3s;
+
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.inputBox:hover {
+  border-color: #555;
+
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.45);
+}
+
+
+.inputBox input {
+  flex: 1;
+
+  width: 100%;
+
+  background: transparent;
+
+  border: none;
+
+  color: white;
+
+  font-size: 16px;
+
+  padding: 18px 60px 18px 22px;
+}
+
+.inputBox input::placeholder {
+  color: #8d8d8d;
+}
+
+.inputBox input:focus {
+  outline: none;
+}
+
+
+/* ===========================
+   SEND BUTTON
+=========================== */
+
+#submit {
+  position: absolute;
+
+  right: 16px;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  background: #3b82f6;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  color: white;
+
+  cursor: pointer;
+
+  transition: 0.25s;
+}
+
+#submit:hover {
+  transform: scale(1.08);
+
+  background: #60a5fa;
+
+  box-shadow:
+    0 0 18px rgba(59, 130, 246, 0.4);
+}
+
+
+/* ===========================
+   INFO TEXT
+=========================== */
+
+.info {
+  margin-top: 14px;
+
+  color: #8d8d8d;
+
+  font-size: 13px;
+
+  text-align: center;
+}
+
+
+/* ===========================
+   DROPDOWN
+=========================== */
+
+.dropdown {
+  position: absolute;
+
+  top: 75px;
+  right: 30px;
+
+  width: 230px;
+
+  background: #2b2b2b;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.06);
+
+  border-radius: 16px;
+
+  overflow: hidden;
+
+  animation: dropdown 0.25s ease;
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.45);
+
+  z-index: 100;
+}
+
+
+@keyframes dropdown {
+
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.dropdownItem {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 15px 18px;
+
+  cursor: pointer;
+
+  transition: 0.25s;
+
+  font-size: 15px;
+}
+
+.dropdownItem i {
+  width: 18px;
+
+  text-align: center;
+
+  color: #b5b5b5;
+}
+
+.dropdownItem:hover {
+  background: #383838;
+
+  color: #fff;
+}
+
+
+/* ===========================
+   LOADER
+=========================== */
+
+.loader-container {
+  position: fixed;
+
+  inset: 0;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
   background: rgba(33, 33, 33, 0.25);
- 
 
   z-index: 999;
 }
 
-/*===========================
-   LOGO
-===========================*/
 
-.logoTitle{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
+/* ===========================
+   RESPONSIVE
+=========================== */
 
-.logoTitle i{
-    color:#3b82f6;
-    font-size:18px;
-}
-/* ===========================================
-   Responsive Design
-=========================================== */
+@media (max-width: 1200px) {
 
-@media (max-width: 1200px){
+  .chats {
+    padding: 25px 25px;
+  }
 
-    .chats{
-        max-width:95%;
-    }
-
-    .inputBox{
-        max-width:95%;
-    }
-
+  .inputBox {
+    max-width: 820px;
+  }
 }
 
 
-@media (max-width:900px){
+@media (max-width: 900px) {
 
-    .navbar{
-        padding:0 20px;
-    }
+  .navbar {
+    padding: 0 20px;
+  }
 
-    .dropdown{
-        right:15px;
-        width:220px;
-    }
+  .dropdown {
+    right: 15px;
 
+    width: 220px;
+  }
 }
 
 
-@media (max-width:768px){
+@media (max-width: 768px) {
 
-    .navbar{
+  .navbar {
+    height: 65px;
 
-        height:65px;
+    min-height: 65px;
 
-        padding:0 15px;
-    }
+    padding: 0 15px;
+  }
 
-    .navbar span{
+  .window-toggle {
+    width: 36px;
+    height: 36px;
+  }
 
-        font-size:17px;
-    }
+  .window-toggle i {
+    font-size: 16px;
+  }
 
-    .userIcon{
+  .logoTitle {
+    font-size: 17px;
+  }
 
-        width:38px;
-        height:38px;
-    }
+  .userIcon {
+    width: 38px;
+    height: 38px;
+  }
 
-    .chatInput{
+  .chats {
+    padding: 20px 16px;
+  }
 
-        padding:15px;
-    }
+  .chatInput {
+    padding: 15px;
+  }
 
-    .inputBox{
+  .inputBox {
+    border-radius: 15px;
+  }
 
-        border-radius:15px;
-    }
+  .inputBox input {
+    font-size: 15px;
 
-    .inputBox input{
+    padding:
+      16px
+      55px
+      16px
+      16px;
+  }
 
-        font-size:15px;
+  #submit {
+    width: 38px;
+    height: 38px;
 
-        padding:16px 55px 16px 16px;
-    }
+    right: 12px;
+  }
 
-    #submit{
+  .info {
+    font-size: 12px;
 
-        width:38px;
-        height:38px;
-
-        right:12px;
-    }
-
-    .info{
-
-        font-size:12px;
-
-        text-align:center;
-
-        padding:0 10px;
-    }
-
+    padding: 0 10px;
+  }
 }
 
 
-@media (max-width:500px){
+@media (max-width: 500px) {
 
-    .navbar{
+  .navbar {
+    padding: 0 12px;
+  }
 
-        padding:0 12px;
-    }
+  .window-toggle {
+    width: 34px;
+    height: 34px;
+  }
 
-    .navbar span{
+  .window-toggle i {
+    font-size: 15px;
+  }
 
-        font-size:16px;
-    }
+  .logoTitle {
+    font-size: 16px;
+  }
 
-    .userIcon{
+  .userIcon {
+    width: 34px;
+    height: 34px;
+  }
 
-        width:34px;
-        height:34px;
-    }
+  .dropdown {
+    width: 190px;
 
-    .dropdown{
+    right: 10px;
+  }
 
-        width:190px;
+  .dropdownItem {
+    padding: 12px;
 
-        right:10px;
-    }
+    font-size: 14px;
+  }
 
-    .dropdownItem{
+  .inputBox {
+    border-radius: 14px;
+  }
 
-        padding:12px;
+  .inputBox input {
+    padding:
+      15px
+      50px
+      15px
+      15px;
 
-        font-size:14px;
-    }
+    font-size: 14px;
+  }
 
-    .inputBox{
-
-        border-radius:14px;
-    }
-
-    .inputBox input{
-
-        padding:15px 50px 15px 15px;
-
-        font-size:14px;
-    }
-
-    #submit{
-
-        width:34px;
-        height:34px;
-    }
-
+  #submit {
+    width: 34px;
+    height: 34px;
+  }
 }

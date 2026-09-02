@@ -18,32 +18,21 @@ export default function Sidebar() {
     setAuthPage,
     setShowAuth,
     logoutUser,
+    setSidebarOpen,
   } = useContext(MyContext);
 
-  //   const logoutUser = () => {
-  //   localStorage.removeItem("token");
-  //   localStorage.removeItem("user");
-
-  //   setCurrentUser(null);
-  //   setAllThread([]);
-  //   setPrevChat([]);
-  //   setReply(null);
-  //   setPrompt("");
-
-  //   setAuthPage("login");
-  //   setShowAuth(true);
-  // };
-
-  // ---------------- Get All Threads ----------------
+  // ==========================
+  // GET ALL THREADS
+  // ==========================
 
   const getAllThread = async () => {
     const token = localStorage.getItem("token");
 
-    //User not logged in
     if (!token) {
       setAllThread([]);
       return;
     }
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/thread`,
@@ -51,7 +40,7 @@ export default function Sidebar() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
       if (response.status === 401) {
@@ -83,7 +72,10 @@ export default function Sidebar() {
       setAllThread([]);
     }
   }, [currentUser]);
-  // ---------------- New Chat ----------------
+
+  // ==========================
+  // NEW CHAT
+  // ==========================
 
   const createNewChat = () => {
     if (!currentUser) {
@@ -91,6 +83,7 @@ export default function Sidebar() {
       setShowAuth(true);
       return;
     }
+
     setNewChat(true);
     setPrompt("");
     setReply(null);
@@ -98,10 +91,13 @@ export default function Sidebar() {
     setPrevChat([]);
   };
 
-  // ---------------- Change Thread ----------------
+  // ==========================
+  // CHANGE THREAD
+  // ==========================
 
   const changeThread = async (newThreadId) => {
     const token = localStorage.getItem("token");
+
     if (!token) {
       setAuthPage("login");
       setShowAuth(true);
@@ -115,8 +111,9 @@ export default function Sidebar() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
+
       if (response.status === 401) {
         logoutUser();
         return;
@@ -127,6 +124,7 @@ export default function Sidebar() {
       }
 
       const res = await response.json();
+
       setCurrThreadId(newThreadId);
       setPrevChat(res.messages || res);
       setNewChat(false);
@@ -136,15 +134,19 @@ export default function Sidebar() {
     }
   };
 
-  // ---------------- Delete Thread ----------------
+  // ==========================
+  // DELETE THREAD
+  // ==========================
 
   const deleteThread = async (threadId) => {
     const token = localStorage.getItem("token");
+
     if (!token) {
       setAuthPage("login");
       setShowAuth(true);
       return;
     }
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/thread/${threadId}`,
@@ -153,19 +155,18 @@ export default function Sidebar() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
+
       if (response.status === 401) {
         logoutUser();
         return;
       }
+
       if (!response.ok) {
         throw new Error("Failed to delete thread");
       }
 
-      // setAllThread((prev) =>
-      //   prev.filter((thread) => thread.threadId !== threadId),
-      // );
       if (threadId === currThreadId) {
         setPrevChat([]);
         setReply(null);
@@ -182,37 +183,130 @@ export default function Sidebar() {
 
   return (
     <section className="sidebar">
-      <button onClick={createNewChat}>
-        <img src={logo} alt="gpt-logo" className="logo" />
 
-        <span>
-          <i className="fa-solid fa-pen-to-square"></i>
-        </span>
-      </button>
+      {/* ==========================
+          SIDEBAR HEADER
+      ========================== */}
 
-      <ul className="history">
-        {allThread?.map((thread) => (
-          <li
-            key={thread.threadId}
-            onClick={() => changeThread(thread.threadId)}
-            className={thread.threadId === currThreadId ? "highlighted" : ""}
+      <div className="sidebarHeader">
+
+        <div className="brand">
+          <img src={logo} alt="SigmaGPT" />
+          <span>ChatGPT</span>
+        </div>
+
+        <div className="headerIcons">
+
+          {/* Search */}
+          <button
+            className="iconButton"
+            title="Search"
           >
-            {thread.title}
+            <i className="fa-solid fa-magnifying-glass"></i>
+          </button>
 
-            <i
-              className="fa-solid fa-trash"
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteThread(thread.threadId);
-              }}
-            ></i>
-          </li>
-        ))}
-      </ul>
+          {/* Close sidebar */}
+          <button
+            className="iconButton"
+            title="Close sidebar"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <i className="fa-solid fa-table-columns"></i>
+          </button>
+
+        </div>
+
+      </div>
+
+
+      {/* ==========================
+          MAIN MENU
+      ========================== */}
+
+      <div className="sidebarMenu">
+
+        {/* New Chat */}
+
+        <button
+          className="menuItem"
+          onClick={createNewChat}
+        >
+          <i className="fa-solid fa-pen-to-square"></i>
+          <span>New chat</span>
+        </button>
+
+
+        {/* Images */}
+
+        <button className="menuItem">
+          <i className="fa-regular fa-image"></i>
+          <span>Images</span>
+        </button>
+
+
+        {/* Apps */}
+
+        <button className="menuItem">
+          <i className="fa-solid fa-table-cells-large"></i>
+          <span>Apps</span>
+        </button>
+
+      </div>
+
+
+      {/* ==========================
+          RECENTS
+      ========================== */}
+
+      <div className="recentSection">
+
+        <h4>Recents</h4>
+
+        <ul className="history">
+
+          {allThread?.map((thread) => (
+
+            <li
+              key={thread.threadId}
+              onClick={() =>
+                changeThread(thread.threadId)
+              }
+              className={
+                thread.threadId === currThreadId
+                  ? "highlighted"
+                  : ""
+              }
+            >
+
+              <span className="threadTitle">
+                {thread.title}
+              </span>
+
+              <i
+                className="fa-solid fa-trash"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteThread(thread.threadId);
+                }}
+              ></i>
+
+            </li>
+
+          ))}
+
+        </ul>
+
+      </div>
+
+
+      {/* ==========================
+          FOOTER
+      ========================== */}
 
       <div className="sign">
         <p>By Ravi Gupta ♥</p>
       </div>
+
     </section>
   );
 }

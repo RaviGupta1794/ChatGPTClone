@@ -1,76 +1,389 @@
+/* ==========================
+   SIDEBAR
+========================== */
+
 .sidebar {
-  background-color: #171717;
-  color: #b4b4b4;
-  height: 100vh;
   width: 320px;
+  height: 100vh;
+
+  flex-shrink: 0;
+
+  background: #171717;
+  color: #b4b4b4;
+
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+
+  z-index: 1500;
+  overflow: hidden;
 }
-.logo {
-  height: 25px;
-  width: 25px;
-  background-color: white;
-  border-radius: 50%;
-  object-fit: cover;
-}
-button {
+
+
+/* ==========================
+   HEADER
+========================== */
+
+.sidebarHeader {
+  height: 65px;
+  min-height: 65px;
+
+  padding: 0 12px;
+
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin: 10px;
+  justify-content: space-between;
+
+  flex-shrink: 0;
+}
+
+
+/* ==========================
+   LOGO + CHATGPT
+========================== */
+
+.brand {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  font-size: 18px;
+  font-weight: 600;
+
+  color: #ececec;
+}
+
+.brand img {
+  width: 28px;
+  height: 28px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  background: white;
+}
+
+
+/* ==========================
+   HEADER ICONS
+========================== */
+
+.headerIcons {
+  display: flex;
+  align-items: center;
+
+  gap: 3px;
+}
+
+
+/* ==========================
+   ICON BUTTON
+========================== */
+
+.iconButton {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0;
+  padding: 0;
+
+  border: none;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #b4b4b4;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease,
+              color 0.2s ease;
+}
+
+.iconButton:hover {
+  background: #2f2f2f;
+  color: white;
+}
+
+.iconButton i {
+  font-size: 16px;
+  color: inherit;
+}
+
+
+/* ==========================
+   MAIN MENU
+========================== */
+
+.sidebarMenu {
+  padding: 8px 10px;
+
+  flex-shrink: 0;
+}
+
+
+/* ==========================
+   MENU BUTTON
+========================== */
+
+.menuItem {
+  width: 100%;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 14px;
+
+  margin: 2px 0;
+  padding: 0 12px;
+
+  border: none;
+  border-radius: 9px;
+
+  background: transparent;
+
+  color: #d1d1d1;
+
+  cursor: pointer;
+
+  font-size: 14px;
+}
+
+.menuItem:hover {
+  background: #2a2a2a;
+  color: white;
+}
+
+.menuItem i {
+  width: 20px;
+
+  text-align: center;
+
+  color: #b4b4b4;
+
+  font-size: 16px;
+}
+
+.menuItem:hover i {
+  color: white;
+}
+
+
+/* ==========================
+   RECENTS
+========================== */
+
+.recentSection {
+  flex: 1;
+
+  min-height: 0;
+
+  overflow-y: auto;
+
   padding: 10px;
-  border-radius: 10px;
-  background-color: transparent;
-  border: solid rgba(255, 255, 255, 0.5);
-  cursor:pointer;
-}
-button span {
-    font-size: 20px;
 }
 
-button:hover{
-    background-color: rgba(255, 255, 255, 0.05);
-}
-.history{
-    margin: 10px;
-    padding: 10px;
-    height:100%;
+
+/* ==========================
+   RECENT HEADING
+========================== */
+
+.recentSection h4 {
+  margin: 10px 12px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  color: #8e8e8e;
+
+  text-transform: none;
 }
 
-.history li{
-    list-style-type:none;
-    cursor:pointer;
-    padding:2px 5px;
-    margin-bottom:0.3rem;
-    font-size:14px;
-    border:solid 10px transparent;
-    position:relative;
+
+/* ==========================
+   HISTORY
+========================== */
+
+.history {
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
 }
-.history li:hover{
-    background-color:rgba(180,180,180,0.05);
-    border-radius:10px;
+
+.history li {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  min-height: 38px;
+
+  padding: 8px 38px 8px 12px;
+
+  margin-bottom: 2px;
+
+  border-radius: 8px;
+
+  color: #c5c5c5;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
 }
-.sign{
-    padding:10px;
-    margin:10px;
-    font-size:14px;
-    text-align:center;
-    border-top:solid 0.25px rgba(255,255,255,0.5);
+
+.history li:hover {
+  background: #2a2a2a;
 }
-.fa-trash{
-    opacity:0;
-    position: absolute;
-    right:0;
+
+.history li.highlighted {
+  background: #2a2a2a;
 }
-.history li:hover .fa-trash{
+
+
+/* ==========================
+   THREAD TITLE
+========================== */
+
+.threadTitle {
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  width: 100%;
+}
+
+
+/* ==========================
+   DELETE ICON
+========================== */
+
+.fa-trash {
+  position: absolute;
+
+  right: 10px;
+
+  opacity: 0;
+
+  color: #999;
+
+  font-size: 13px;
+
+  transition: opacity 0.2s ease;
+}
+
+.history li:hover .fa-trash {
   opacity: 1;
-  color: #fff;
 }
-.fa-trash:hover{
-    color:#f87171;
+
+.fa-trash:hover {
+  color: #f87171 !important;
 }
-.highlighted{
-    background-color: rgba(180,180,180,0.05);
-    border-radius: 10px;
+
+
+/* ==========================
+   FOOTER
+========================== */
+
+.sign {
+  flex-shrink: 0;
+
+  padding: 12px 15px;
+
+  margin: 0 10px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+  text-align: center;
+
+  font-size: 13px;
+
+  color: #777;
+}
+
+.sign p {
+  margin: 8px 0;
+}
+
+
+/* ==========================
+   SIDEBAR SCROLLBAR
+========================== */
+
+.recentSection::-webkit-scrollbar {
+  width: 6px;
+}
+
+.recentSection::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 10px;
+}
+
+.recentSection::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+/* ==========================
+   TABLET
+========================== */
+
+@media (max-width: 900px) {
+
+  .sidebar {
+    width: 280px;
+  }
+}
+
+
+/* ==========================
+   MOBILE
+========================== */
+
+@media (max-width: 600px) {
+
+  .sidebar {
+    width: 80vw;
+    max-width: 320px;
+  }
+
+  .brand {
+    font-size: 17px;
+  }
+}
+
+
+/* ==========================
+   SMALL MOBILE
+========================== */
+
+@media (max-width: 400px) {
+
+  .sidebar {
+    width: 85vw;
+  }
+
+  .sidebarHeader {
+    padding: 0 8px;
+  }
+
+  .brand {
+    font-size: 16px;
+  }
+
+  .menuItem {
+    height: 42px;
+  }
 }

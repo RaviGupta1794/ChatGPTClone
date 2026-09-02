@@ -11,7 +11,6 @@ export default function ChatWindow() {
     prompt,
     setPrompt,
     reply,
-    setReply,
     currThreadId,
     setPrevChat,
     setNewChat,
@@ -22,18 +21,23 @@ export default function ChatWindow() {
     currentUser,
     logoutUser,
     setAllThread,
+
+    // SIDEBAR
+    sidebarOpen,
+    setSidebarOpen,
   } = useContext(MyContext);
 
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [lastPrompt, setLastPrompt] = useState("");
 
-  //-----get reply ------
+  // ==========================
+  // GET REPLY
+  // ==========================
 
   const getReply = async () => {
     const token = localStorage.getItem("token");
 
-    // If user is not logged in, we show login popup
     if (!token) {
       setAuthPage("login");
       setShowAuth(true);
@@ -48,10 +52,12 @@ export default function ChatWindow() {
 
     const options = {
       method: "POST",
+
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
+
       body: JSON.stringify({
         message: prompt,
         threadId: currThreadId,
@@ -59,7 +65,11 @@ export default function ChatWindow() {
     };
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chat`, options);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/chat`,
+        options
+      );
+
       const res = await response.json().catch(() => ({}));
 
       if (response.status === 401) {
@@ -76,12 +86,14 @@ export default function ChatWindow() {
         return;
       }
 
-      setReply(res.reply);
-
-      // Adding first chat to sidebar immediately
+      // Save reply
+      // setReply is not needed here if your backend reply
+      // is handled through another state.
+      
+      // Add first chat to sidebar
       setAllThread((prev) => {
         const alreadyExist = prev.some(
-          (thread) => thread.threadId === currThreadId,
+          (thread) => thread.threadId === currThreadId
         );
 
         if (alreadyExist) {
@@ -97,7 +109,6 @@ export default function ChatWindow() {
         ];
       });
 
-
     } catch (error) {
       console.log(error);
     } finally {
@@ -105,14 +116,20 @@ export default function ChatWindow() {
     }
   };
 
+  // ==========================
+  // ADD MESSAGE
+  // ==========================
+
   useEffect(() => {
     if (reply && lastPrompt) {
       setPrevChat((prev) => [
         ...prev,
+
         {
           role: "user",
           content: lastPrompt,
         },
+
         {
           role: "assistant",
           content: reply,
@@ -122,48 +139,89 @@ export default function ChatWindow() {
       setPrompt("");
       setLastPrompt("");
     }
-  }, [reply]);
+  }, [reply, lastPrompt, setPrevChat, setPrompt]);
+
+  // ==========================
+  // PROFILE
+  // ==========================
 
   const handleProfileClick = () => {
-    setIsOpen(!isOpen);
+    setIsOpen((prev) => !prev);
   };
 
-  // const handleLogout = () => {
-  //   localStorage.removeItem("token");
-  //   localStorage.removeItem("user");
+  // ==========================
+  // TOGGLE SIDEBAR
+  // ==========================
 
-  //   setCurrentUser(null);
+  const toggleSidebar = () => {
+    setSidebarOpen((prev) => !prev);
+  };
 
-  //   setPrevChat([]);
-  //   setReply(null);
-  //   setPrompt("");
-  //   setNewChat(true);
-  //   setCurrThreadId(uuidv4());
-
-  //   setIsOpen(false);
-  // };
   return (
     <>
       <div className="chat-window">
-        <div className="navbar">
-          <span className="logoTitle">
-            <i className="fa-solid fa-wand-magic-sparkles"></i>
-            SigmaGPT
-          </span>
 
-          <div className="userIconDiv" onClick={handleProfileClick}>
+        {/* ==========================
+            NAVBAR
+        ========================== */}
+
+        <div className="navbar">
+
+          <div className="navbar-left">
+
+            {/* SIDEBAR TOGGLE */}
+
+            <button
+              className={`window-toggle ${
+                sidebarOpen ? "sidebar-is-open" : "sidebar-is-closed"
+              }`}
+              onClick={toggleSidebar}
+              aria-label={
+                sidebarOpen ? "Hide sidebar" : "Show sidebar"
+              }
+              title={
+                sidebarOpen ? "Hide sidebar" : "Show sidebar"
+              }
+            >
+              <i className="fa-solid fa-table-columns"></i>
+            </button>
+
+            {/* TITLE */}
+
+            <span className="logoTitle">
+              ChatGPT
+            </span>
+
+          </div>
+
+          {/* ==========================
+              USER
+          ========================== */}
+
+          <div
+            className="userIconDiv"
+            onClick={handleProfileClick}
+          >
             <span className="userIcon">
+
               {currentUser ? (
                 currentUser.name.charAt(0).toUpperCase()
               ) : (
                 <i className="fa-solid fa-user"></i>
               )}
+
             </span>
           </div>
+
         </div>
+
+        {/* ==========================
+            DROPDOWN
+        ========================== */}
 
         {isOpen && (
           <div className="dropdown">
+
             <div className="dropdownItem">
               <i className="fa-solid fa-cloud-arrow-up"></i>
               Upgrade Plan
@@ -201,6 +259,7 @@ export default function ChatWindow() {
                 </div>
               </>
             )}
+
             {currentUser && (
               <div
                 className="dropdownItem"
@@ -213,10 +272,19 @@ export default function ChatWindow() {
                 Logout
               </div>
             )}
+
           </div>
         )}
 
+        {/* ==========================
+            CHAT
+        ========================== */}
+
         <Chat />
+
+        {/* ==========================
+            LOADER
+        ========================== */}
 
         {loading && (
           <div className="loader-container">
@@ -231,8 +299,14 @@ export default function ChatWindow() {
           </div>
         )}
 
+        {/* ==========================
+            INPUT
+        ========================== */}
+
         <div className="chatInput">
+
           <div className="inputBox">
+
             <input
               placeholder="Ask anything..."
               value={prompt}
@@ -244,16 +318,27 @@ export default function ChatWindow() {
               }}
             />
 
-            <div id="submit" onClick={getReply}>
+            <div
+              id="submit"
+              onClick={getReply}
+            >
               <i className="fa-solid fa-paper-plane"></i>
             </div>
+
           </div>
 
           <p className="info">
-            ChatGPT can make mistakes. Consider checking important information.
+            ChatGPT can make mistakes. Consider checking important
+            information.
           </p>
+
         </div>
+
       </div>
+
+      {/* ==========================
+          AUTH
+      ========================== */}
 
       {showAuth && (
         <div className="auth-overlay">

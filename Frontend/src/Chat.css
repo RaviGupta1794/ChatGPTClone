@@ -1,40 +1,85 @@
 /* ==========================
-   Chat Container
+   CHAT CONTAINER
 ========================== */
 
 .chats {
-  width: 100%;
-  max-width: 850px;
-  margin: 0 auto;
-  padding: 30px 20px;
-  overflow-y: auto;
   flex: 1;
-  scroll-behavior: smooth;
+
+  width: 100%;
+  max-width: none;
+
+  min-width: 0;
+  min-height: 0;
+
+  margin: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  box-sizing: border-box;
+
+  padding: 25px 30px;
+
+  scrollbar-gutter: stable;
 }
 
-/* Scrollbar */
+
+/* ==========================
+   CHAT CONTENT
+========================== */
+
+.chat-content {
+  width: 100%;
+
+  max-width: 850px;
+
+  margin: 0 auto;
+
+  box-sizing: border-box;
+}
+
+
+/* ==========================
+   SCROLLBAR
+========================== */
 
 .chats::-webkit-scrollbar {
   width: 8px;
-}
-
-.chats::-webkit-scrollbar-thumb {
-  background: #4d4d4d;
-  border-radius: 20px;
 }
 
 .chats::-webkit-scrollbar-track {
   background: transparent;
 }
 
+.chats::-webkit-scrollbar-thumb {
+  background: #4d4d4d;
+
+  border-radius: 20px;
+}
+
+.chats::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+
+/* Firefox */
+
+.chats {
+  scrollbar-width: thin;
+  scrollbar-color: #4d4d4d transparent;
+}
+
+
 /* ==========================
-   Message Wrapper
+   MESSAGES
 ========================== */
 
 .userDiv,
 .gptDiv {
   display: flex;
+
   width: 100%;
+
   margin: 14px 0;
 }
 
@@ -46,15 +91,18 @@
   justify-content: flex-start;
 }
 
+
 /* ==========================
-   User Message
+   USER MESSAGE
 ========================== */
 
 .userMessage {
   max-width: 75%;
+
   width: fit-content;
 
   background: #343541;
+
   color: white;
 
   padding: 14px 18px;
@@ -65,31 +113,45 @@
 
   word-break: break-word;
 
-  box-shadow: 0 8px 18px rgba(0, 0, 0, .25);
+  overflow-wrap: anywhere;
+
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+
+  margin: 0;
 }
+
+
 /* ==========================
-   Assistant Message
+   ASSISTANT MESSAGE
 ========================== */
 
 .assistantMessage {
   width: 100%;
+
   max-width: 100%;
 
   color: #ececec;
 
   font-size: 15px;
+
   line-height: 1.8;
 
   word-break: break-word;
 
+  overflow-wrap: anywhere;
+
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Markdown */
+
+/* ==========================
+   MARKDOWN
+========================== */
 
 .assistantMessage p {
   margin: 12px 0;
 }
+
 
 .assistantMessage h1,
 .assistantMessage h2,
@@ -97,115 +159,231 @@
   margin: 20px 0 12px;
 }
 
+
 .assistantMessage ul,
 .assistantMessage ol {
   padding-left: 24px;
+
   margin: 10px 0;
 }
+
 
 .assistantMessage li {
   margin: 6px 0;
 }
 
+
 .assistantMessage blockquote {
   border-left: 4px solid #339cff;
+
   padding-left: 16px;
+
   margin: 16px 0;
+
   color: #bfbfbf;
 }
 
+
+/* ==========================
+   CODE BLOCK
+========================== */
+
 .assistantMessage pre {
   margin: 18px 0;
+
+  max-width: 100%;
+
   overflow-x: auto;
 }
 
+
 .assistantMessage code:not(pre code) {
   background: #313131;
+
   padding: 3px 6px;
+
   border-radius: 6px;
+
   font-size: 14px;
 }
 
+
 .hljs {
   border-radius: 14px !important;
+
   padding: 18px !important;
+
+  max-width: 100%;
+
+  overflow-x: auto;
 }
 
-/* Smooth animation */
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-/* Inline Code */
+/* ==========================
+   INLINE CODE
+========================== */
 
 .gptDiv code:not(pre code) {
   background: #313131;
+
   padding: 2px 6px;
+
   border-radius: 6px;
 }
 
+
 /* ==========================
-   Welcome Screen
+   FADE ANIMATION
+========================== */
+
+@keyframes fadeIn {
+
+  from {
+    opacity: 0;
+
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+
+/* ==========================
+   WELCOME SCREEN
 ========================== */
 
 .welcomeScreen {
-  height: 70vh;
+  min-height: 70vh;
 
   display: flex;
+
   flex-direction: column;
+
   justify-content: center;
+
   align-items: center;
 
   text-align: center;
 }
 
+
 .welcomeScreen h1 {
   font-size: clamp(2rem, 5vw, 3rem);
+
   font-weight: 700;
+
   color: white;
+
+  margin: 0;
 }
+
 
 .welcomeScreen p {
   margin-top: 12px;
+
   color: #8b8b8b;
+
   font-size: 16px;
 }
 
+
 /* ==========================
-   Chat Time
+   CHAT TIME
 ========================== */
 
 .chatTime {
   text-align: center;
+
   color: #8b8b8b;
+
   font-size: 13px;
+
   margin-bottom: 25px;
 }
 
+
 /* ==========================
-   Responsive
+   LARGE SCREEN
 ========================== */
 
-@media (max-width: 992px) {
+@media (min-width: 1400px) {
 
   .chats {
-    max-width: 100%;
-    padding: 25px 18px;
+    padding-left: 30px;
+    padding-right: 30px;
   }
 
+  .chat-content {
+    max-width: 850px;
+  }
 }
+
+
+/* ==========================
+   TABLET
+========================== */
+
+@media (max-width: 1100px) {
+
+  .chats {
+    padding: 25px 25px;
+  }
+
+  .chat-content {
+    max-width: 850px;
+  }
+}
+
+
+/* ==========================
+   SMALL LAPTOP
+========================== */
+
+@media (max-width: 900px) {
+
+  .chats {
+    padding: 25px 20px;
+  }
+
+  .chat-content {
+    max-width: 800px;
+  }
+
+  .userMessage {
+    max-width: 80%;
+  }
+}
+
+
+/* ==========================
+   MOBILE
+========================== */
 
 @media (max-width: 768px) {
 
+  .chats {
+    width: 100%;
+
+    max-width: none;
+
+    margin: 0;
+
+    padding: 20px 16px;
+  }
+
+  .chat-content {
+    width: 100%;
+
+    max-width: none;
+  }
+
   .userMessage {
     max-width: 88%;
+
     font-size: 15px;
   }
 
@@ -213,11 +391,19 @@
     font-size: 15px;
   }
 
+  .welcomeScreen {
+    min-height: 60vh;
+  }
+
   .welcomeScreen h1 {
     font-size: 2rem;
   }
-
 }
+
+
+/* ==========================
+   SMALL MOBILE
+========================== */
 
 @media (max-width: 480px) {
 
@@ -227,12 +413,18 @@
 
   .userMessage {
     max-width: 95%;
+
     padding: 12px 15px;
+
     font-size: 14px;
   }
 
   .gptDiv {
     font-size: 14px;
+  }
+
+  .welcomeScreen {
+    min-height: 55vh;
   }
 
   .welcomeScreen h1 {
@@ -243,4 +435,7 @@
     font-size: 14px;
   }
 
+  .chatTime {
+    font-size: 12px;
+  }
 }

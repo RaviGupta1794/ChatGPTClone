@@ -1,13 +1,201 @@
-*{
+/* ==========================
+   GLOBAL
+========================== */
+
+* {
+  box-sizing: border-box;
   color: #ececec;
-  font-family: Roboto,'sans-serif','Helvetica Neue';
+  font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-body{
-    margin:0;
-    padding:0;
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
-.app{
-    background-color: #212121;
-    display:flex;
+
+body {
+  overflow: hidden;
+}
+
+
+/* ==========================
+   APP
+========================== */
+
+.app {
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+
+  position: relative;
+
+  overflow: hidden;
+
+  background: #212121;
+}
+
+
+/* ==========================
+   SIDEBAR
+========================== */
+
+.sidebar {
+  width: 320px;
+  height: 100vh;
+
+  flex-shrink: 0;
+
+  z-index: 1500;
+}
+
+
+/* ==========================
+   CHAT WINDOW
+========================== */
+.chat-window {
+  flex: 1;
+
+  min-width: 0;
+
+  height: 100vh;
+
+  background: #212121;
+
+  color: white;
+
+  display: flex;
+
+  flex-direction: column;
+
+  position: relative;
+
+  overflow: hidden;
+}
+
+
+/* ==========================
+   SIDEBAR TOGGLE
+========================== */
+
+.sidebar-toggle {
+  position: fixed;
+
+  top: 18px;
+  left: 20px;
+
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  margin: 0;
+
+  border: none;
+  border-radius: 9px;
+
+  background: transparent;
+
+  color: #b4b4b4;
+
+  cursor: pointer;
+
+  z-index: 3000;
+
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+  background-color: #303030;
+  color: white;
+}
+
+.sidebar-toggle i {
+  font-size: 18px;
+  color: inherit;
+}
+
+
+/* ==========================
+   TABLET
+========================== */
+
+@media (max-width: 900px) {
+
+  .sidebar {
+    width: 280px;
+  }
+
+  .sidebar-toggle {
+    top: 18px;
+    left: 18px;
+
+    width: 38px;
+    height: 38px;
+  }
+}
+
+
+/* ==========================
+   MOBILE
+========================== */
+
+@media (max-width: 600px) {
+
+  .sidebar {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 80vw;
+    max-width: 320px;
+  }
+
+  .chat-window {
+    width: 100%;
+  }
+
+  .sidebar-toggle {
+    top: 15px;
+    left: 15px;
+
+    width: 36px;
+    height: 36px;
+  }
+
+  .sidebar-toggle i {
+    font-size: 16px;
+  }
+}
+
+
+/* ==========================
+   SMALL MOBILE
+========================== */
+
+@media (max-width: 400px) {
+
+  .sidebar {
+    width: 85vw;
+  }
+
+  .sidebar-toggle {
+    top: 12px;
+    left: 12px;
+
+    width: 34px;
+    height: 34px;
+  }
+
+  .sidebar-toggle i {
+    font-size: 15px;
+  }
 }
