@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef} from "react";
 import "./Chat.css";
 import MyContext from "./MyContext.jsx";
 import ReactMarkdown from "react-markdown";
@@ -9,6 +9,8 @@ export default function Chat() {
   const { prevChat, reply } = useContext(MyContext);
 
   const [latestReply, setLatestReply] = useState(null);
+
+  const bottomRef = useRef(null);
 
   useEffect(() => {
     if (reply === null) {
@@ -36,6 +38,12 @@ export default function Chat() {
 
     return () => clearInterval(interval);
   }, [prevChat, reply]);
+
+  useEffect(() => {
+  bottomRef.current?.scrollIntoView({
+    behavior: "auto",
+  });
+}, [latestReply, prevChat]);
 
   return (
     <div className="chats">
@@ -100,6 +108,7 @@ export default function Chat() {
                 </div>
               </div>
             )}
+              <div ref={bottomRef}></div>
           </>
         )}
 

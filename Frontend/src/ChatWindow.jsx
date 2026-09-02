@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import "./ChatWindow.css";
 import Chat from "./Chat";
 import MyContext from "./MyContext.jsx";
@@ -10,16 +10,24 @@ export default function ChatWindow() {
   const {
     prompt,
     setPrompt,
+
+    // IMPORTANT
     reply,
+    setReply,
+
     currThreadId,
     setPrevChat,
     setNewChat,
+
     showAuth,
     setShowAuth,
+
     authPage,
     setAuthPage,
+
     currentUser,
     logoutUser,
+
     setAllThread,
 
     // SIDEBAR
@@ -29,26 +37,35 @@ export default function ChatWindow() {
 
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [lastPrompt, setLastPrompt] = useState("");
 
   // ==========================
   // GET REPLY
   // ==========================
 
   const getReply = async () => {
+    // Prevent multiple requests
+    if (loading) return;
+
+    // Get token
     const token = localStorage.getItem("token");
 
+    // User not logged in
     if (!token) {
       setAuthPage("login");
       setShowAuth(true);
       return;
     }
 
+    // Empty input
     if (!prompt.trim()) return;
 
+    // Save current prompt before clearing input
+    const currentPrompt = prompt.trim();
+
     setLoading(true);
+
+    // This is NOT a new chat
     setNewChat(false);
-    setLastPrompt(prompt);
 
     const options = {
       method: "POST",
@@ -59,7 +76,7 @@ export default function ChatWindow() {
       },
 
       body: JSON.stringify({
-        message: prompt,
+        message: currentPrompt,
         threadId: currThreadId,
       }),
     };
@@ -72,6 +89,10 @@ export default function ChatWindow() {
 
       const res = await response.json().catch(() => ({}));
 
+      // ==========================
+      // UNAUTHORIZED
+      // ==========================
+
       if (response.status === 401) {
         logoutUser();
 
@@ -81,65 +102,62 @@ export default function ChatWindow() {
         return;
       }
 
+      // ==========================
+      // OTHER ERROR
+      // ==========================
+
       if (!response.ok) {
-        console.log(res.message);
+        console.log("Chat error:", res.message);
         return;
       }
 
-      // Save reply
-      // setReply is not needed here if your backend reply
-      // is handled through another state.
-      
-      // Add first chat to sidebar
+      // ==========================
+      // BACKEND REPLY
+      // ==========================
+
+      console.log("Backend response:", res);
+
+      // Save AI reply in context
+      setReply(res.reply);
+
+      // ==========================
+      // CLEAR INPUT
+      // ==========================
+
+      setPrompt("");
+
+      // ==========================
+      // ADD THREAD TO SIDEBAR
+      // ==========================
+
       setAllThread((prev) => {
         const alreadyExist = prev.some(
           (thread) => thread.threadId === currThreadId
         );
 
+        // Thread already exists
         if (alreadyExist) {
           return prev;
         }
 
+        // First message of this thread
         return [
           ...prev,
           {
             threadId: currThreadId,
-            title: prompt.slice(0, 25) + "...",
+            title:
+              currentPrompt.length > 25
+                ? currentPrompt.slice(0, 25) + "..."
+                : currentPrompt,
           },
         ];
       });
-
     } catch (error) {
-      console.log(error);
+      console.log("Fetch error:", error);
     } finally {
       setLoading(false);
     }
   };
-
-  // ==========================
-  // ADD MESSAGE
-  // ==========================
-
-  useEffect(() => {
-    if (reply && lastPrompt) {
-      setPrevChat((prev) => [
-        ...prev,
-
-        {
-          role: "user",
-          content: lastPrompt,
-        },
-
-        {
-          role: "assistant",
-          content: reply,
-        },
-      ]);
-
-      setPrompt("");
-      setLastPrompt("");
-    }
-  }, [reply, lastPrompt, setPrevChat, setPrompt]);
 
   // ==========================
   // PROFILE
@@ -155,6 +173,17 @@ export default function ChatWindow() {
 
   const toggleSidebar = () => {
     setSidebarOpen((prev) => !prev);
+  };
+
+  // ==========================
+  // ENTER KEY
+  // ==========================
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      getReply();
+    }
   };
 
   return (
@@ -173,14 +202,20 @@ export default function ChatWindow() {
 
             <button
               className={`window-toggle ${
-                sidebarOpen ? "sidebar-is-open" : "sidebar-is-closed"
+                sidebarOpen
+                  ? "sidebar-is-open"
+                  : "sidebar-is-closed"
               }`}
               onClick={toggleSidebar}
               aria-label={
-                sidebarOpen ? "Hide sidebar" : "Show sidebar"
+                sidebarOpen
+                  ? "Hide sidebar"
+                  : "Show sidebar"
               }
               title={
-                sidebarOpen ? "Hide sidebar" : "Show sidebar"
+                sidebarOpen
+                  ? "Hide sidebar"
+                  : "Show sidebar"
               }
             >
               <i className="fa-solid fa-table-columns"></i>
@@ -205,7 +240,9 @@ export default function ChatWindow() {
             <span className="userIcon">
 
               {currentUser ? (
-                currentUser.name.charAt(0).toUpperCase()
+                currentUser.name
+                  .charAt(0)
+                  .toUpperCase()
               ) : (
                 <i className="fa-solid fa-user"></i>
               )}
@@ -222,18 +259,28 @@ export default function ChatWindow() {
         {isOpen && (
           <div className="dropdown">
 
+            {/* Upgrade */}
+
             <div className="dropdownItem">
               <i className="fa-solid fa-cloud-arrow-up"></i>
               Upgrade Plan
             </div>
+
+            {/* Settings */}
 
             <div className="dropdownItem">
               <i className="fa-solid fa-gear"></i>
               Settings
             </div>
 
+            {/* ==========================
+                NOT LOGGED IN
+            ========================== */}
+
             {!currentUser && (
               <>
+                {/* Sign Up */}
+
                 <div
                   className="dropdownItem"
                   onClick={() => {
@@ -245,6 +292,8 @@ export default function ChatWindow() {
                   <i className="fa-solid fa-user-plus"></i>
                   Sign Up
                 </div>
+
+                {/* Login */}
 
                 <div
                   className="dropdownItem"
@@ -259,6 +308,10 @@ export default function ChatWindow() {
                 </div>
               </>
             )}
+
+            {/* ==========================
+                LOGGED IN
+            ========================== */}
 
             {currentUser && (
               <div
@@ -308,19 +361,20 @@ export default function ChatWindow() {
           <div className="inputBox">
 
             <input
+              type="text"
               placeholder="Ask anything..."
               value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  getReply();
-                }
-              }}
+              onChange={(e) =>
+                setPrompt(e.target.value)
+              }
+              onKeyDown={handleKeyDown}
+              disabled={loading}
             />
 
             <div
               id="submit"
               onClick={getReply}
+              className={loading ? "disabled" : ""}
             >
               <i className="fa-solid fa-paper-plane"></i>
             </div>
@@ -328,8 +382,8 @@ export default function ChatWindow() {
           </div>
 
           <p className="info">
-            ChatGPT can make mistakes. Consider checking important
-            information.
+            ChatGPT can make mistakes. Consider
+            checking important information.
           </p>
 
         </div>
@@ -342,7 +396,13 @@ export default function ChatWindow() {
 
       {showAuth && (
         <div className="auth-overlay">
-          {authPage === "login" ? <Login /> : <SignUp />}
+
+          {authPage === "login" ? (
+            <Login />
+          ) : (
+            <SignUp />
+          )}
+
         </div>
       )}
     </>
